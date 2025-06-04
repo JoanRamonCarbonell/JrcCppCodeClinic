@@ -34,22 +34,22 @@ void Weather_stats::readDb() {
     std::string data_file{"data1.txt"};
     std::fstream data(data_file);
 
-    if (!data) {
-        std::cerr << "Could not open file.";
-        return 1;
-    }
+    // if (!data) {
+    //     std::cerr << "Could not open file.";
+    //     return 1;
+    // }
 
     std::string line;
-    while (std::getline(data, line)) {
-        std::istringstream iss(line);
-        std::string date;
-        std::string time;
-        std::string a;
+    // while (std::getline(data, line)) {
+    //     std::istringstream iss(line);
+    //     std::string date;
+    //     std::string time;
+    //     std::string a;
 
-        iss >> date >> time >> a;
-        // parse data from line
-        // considering 
-    }
+    //     iss >> date >> time >> a;
+    //     // parse data from line
+    //     // considering 
+    // }
 
     // Read data and dump it in vector
 }

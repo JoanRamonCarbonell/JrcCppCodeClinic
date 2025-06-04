@@ -1,5 +1,5 @@
 #include "EightQueens/EightQueens.h"
-#include <stdio>
+#include <iostream>
 
 namespace eight_queens
 {
