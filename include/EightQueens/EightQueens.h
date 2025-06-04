@@ -7,27 +7,59 @@
 #include <utility>
 namespace eight_queens
 {
-constexpr auto POS_NUMBER{8};
+constexpr auto MAX_POSITION{8};
 constexpr auto QUEENS_NUM{8};
 constexpr auto QUEEN{'Q'};
 constexpr auto COLUMN_LIMIT{" | "};
 const std::string BOARD_LIMIT{" +===============================+"};
 const std::string BOARD_INTERLINE{" |-------------------------------|"};
-
-
+const std::string SUCCESS_MSG{"The 8 QUEENS were successfully located!!!"}; 
+const std::string FINISH_MSG{"All possible cobinations were tried."};
+const std::string BEGIN_MSG{"Running : Eight Queens"};
+const std::string END_MSG{"End : Eight Queens"};
 
 class EightQueens : public IEightQueens
 {
-public:
+  public:
+  /**
+   * @brief  
+   */
     EightQueens() { run(); }
+    
+  /**
+   * @brief  
+   */
     void run() override;
+    
+  private:
+  /**
+   * @brief  
+   */
     void paint_chess_board();
+
+  /**
+   * @brief  
+   * @param 
+   * @return 
+   */
     bool is_queen_in_row(int& row);
+
+  /**
+   * @brief  
+   * @param 
+   * @return 
+   */
     bool is_queen_in_col(int& col);
+
+  /**
+   * @brief  
+   * @param 
+   * @param 
+   * @return 
+   */
     bool is_queen_in_diagonal(const int& row, const int& col);
 
-private:
-    std::array<std::array<char, POS_NUMBER>, POS_NUMBER> m_chess_board;
+    std::array<std::array<char, MAX_POSITION>, MAX_POSITION> m_chess_board;
     int m_located_queens{0};
     std::map<int, std::pair<int, int>> m_queens_position;
 };

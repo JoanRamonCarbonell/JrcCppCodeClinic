@@ -8,14 +8,13 @@ using namespace std;
 
 void EightQueens::run() {
 
-    cout << "Running : Eight Queens" << endl;
+    cout << BEGIN_MSG << endl;
     int successful_combinations{0};
     bool all_combinations_tried{false};
 
     auto locate_queen{[&](int i, int j){
         m_chess_board[i][j] = QUEEN;
         m_queens_position.insert({m_located_queens, {i, j}});
-//        cout << "### Queen located at : (" << i << "," << j << ") ###" << endl;
         m_located_queens++;
     }};
     
@@ -27,9 +26,9 @@ void EightQueens::run() {
         // Locate 1st queen 
         locate_queen(first_queen_i, first_queen_j);
         // find where to locate next queen
-        for (auto i=0; i<POS_NUMBER ; i++) {
+        for (auto i=0; i<MAX_POSITION ; i++) {
             if (!is_queen_in_row(i)) {
-                for (auto j=0; j<POS_NUMBER ; j++) {
+                for (auto j=0; j<MAX_POSITION ; j++) {
                     if (!is_queen_in_col(j)) {
                         if (!is_queen_in_diagonal(i,j)) {
                             locate_queen(i,j);
@@ -42,7 +41,7 @@ void EightQueens::run() {
         
         if (m_located_queens == QUEENS_NUM) {
             paint_chess_board();
-            cout << "The 8 QUEENS were successfully located!!!" << endl;
+            cout << SUCCESS_MSG << endl;
             successful_combinations++;
         } else {
             cout << "Starting from (" << first_queen_i << "," << first_queen_j << ")" << " only " 
@@ -55,21 +54,21 @@ void EightQueens::run() {
             m_queens_position.clear();
         }
 
-        if (first_queen_i < POS_NUMBER-1) {
+        if (first_queen_i < MAX_POSITION-1) {
             first_queen_i++;
         } else {
             first_queen_i = 0;
             first_queen_j++;
-            if (first_queen_j>=POS_NUMBER) {
+            if (first_queen_j>=MAX_POSITION) {
                 all_combinations_tried=true;
                 cout << "====================================" << endl;
-                cout << "All possible cobinations were tried." << endl;
+                cout << FINISH_MSG << endl;
                 cout << successful_combinations << " successful combinations found!!!" << endl;
                 cout << "====================================" << endl;
             }
         }
     }
-    cout << "End : Eight Queens" << endl;
+    cout << END_MSG << endl;
 
 }
 
@@ -93,6 +92,7 @@ bool EightQueens::is_queen_in_col(int& col) {
 
 bool EightQueens::is_queen_in_diagonal(const int& i, const int& j) {
 
+    // TODO: function refactoring
     pair<int, int> diag_increment{0,0};
 
     bool limit_reached{false};
@@ -103,8 +103,8 @@ bool EightQueens::is_queen_in_diagonal(const int& i, const int& j) {
     while (!limit_reached) {
         diag_increment.first++;
         diag_increment.second++;
-        if ((diag_increment.first < POS_NUMBER) && 
-            (diag_increment.second < POS_NUMBER)) {
+        if ((diag_increment.first < MAX_POSITION) && 
+            (diag_increment.second < MAX_POSITION)) {
             // check if the new incremented diagonal position is found in m_queens_position
             for (const auto& [key, queen_position] : m_queens_position) {
                 if ((queen_position.first == diag_increment.first) &&
@@ -150,7 +150,7 @@ bool EightQueens::is_queen_in_diagonal(const int& i, const int& j) {
     while (!limit_reached) {
         diag_increment.first++;
         diag_increment.second--;
-        if ((diag_increment.first < POS_NUMBER) && 
+        if ((diag_increment.first < MAX_POSITION) && 
             (diag_increment.second >= 0)) {
             // check if the new incremented diagonal position is found in m_queens_position
             for (const auto& [key, queen_position] : m_queens_position) {
@@ -173,7 +173,7 @@ bool EightQueens::is_queen_in_diagonal(const int& i, const int& j) {
         diag_increment.first--;
         diag_increment.second++;
         if ((diag_increment.first >= 0) && 
-            (diag_increment.second < POS_NUMBER)) {
+            (diag_increment.second < MAX_POSITION)) {
             // check if the new incremented diagonal position is found in m_queens_position
             for (const auto& [key, queen_position] : m_queens_position) {
                 if ((queen_position.first == diag_increment.first) &&
@@ -206,7 +206,7 @@ void EightQueens::paint_chess_board() {
         }
         cout << line << endl;
         interline_counter++;
-        if (interline_counter < POS_NUMBER) { 
+        if (interline_counter < MAX_POSITION) { 
             cout << BOARD_INTERLINE << endl;
         }
     }
