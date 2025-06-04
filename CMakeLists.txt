@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(myprogram 
     main.cpp
-    src/WeatherStatistics/weather_statistics.cpp
     src/EightQueens/EightQueens.cpp
 )
 
