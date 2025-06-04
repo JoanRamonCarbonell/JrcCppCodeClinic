@@ -24,7 +24,7 @@ public:
     void paint_chess_board();
     bool is_queen_in_row(int& row);
     bool is_queen_in_col(int& col);
-    bool is_queen_in_diagonal(int& row, int& col);
+    bool is_queen_in_diagonal(const int& row, const int& col);
 
 private:
     std::array<std::array<char, POS_NUMBER>, POS_NUMBER> m_chess_board;

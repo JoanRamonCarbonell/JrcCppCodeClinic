@@ -1,5 +1,6 @@
 #include "EightQueens/EightQueens.h"
 #include <iostream>
+#include <cstdlib>
 
 namespace eight_queens
 {
@@ -8,18 +9,24 @@ using namespace std;
 void EightQueens::run() {
 
     cout << "Running : Eight Queens" << endl;
+    int successful_combinations{0};
+    bool all_combinations_tried{false};
 
-    // Locate 1st queen (hardcoded in v1)
     auto locate_queen{[&](int i, int j){
         m_chess_board[i][j] = QUEEN;
         m_queens_position.insert({m_located_queens, {i, j}});
-        cout << "### Queen located at : (" << i << "," << j << ") ###" << endl;
+//        cout << "### Queen located at : (" << i << "," << j << ") ###" << endl;
         m_located_queens++;
     }};
-
-    locate_queen(3,5);
-    while (m_located_queens < QUEENS_NUM) {
-        // locate next queen
+    
+    auto first_queen_i=0;
+    auto first_queen_j=0;
+    while (!all_combinations_tried) {
+        cout << "___________________________________________" << endl;
+        cout << "+++ Starting with first queen at (" << first_queen_i << "," << first_queen_j << ") +++" << endl;
+        // Locate 1st queen 
+        locate_queen(first_queen_i, first_queen_j);
+        // find where to locate next queen
         for (auto i=0; i<POS_NUMBER ; i++) {
             if (!is_queen_in_row(i)) {
                 for (auto j=0; j<POS_NUMBER ; j++) {
@@ -32,10 +39,38 @@ void EightQueens::run() {
                 }
             }
         }
-    }
+        
+        if (m_located_queens == QUEENS_NUM) {
+            paint_chess_board();
+            cout << "The 8 QUEENS were successfully located!!!" << endl;
+            successful_combinations++;
+        } else {
+            cout << "Starting from (" << first_queen_i << "," << first_queen_j << ")" << " only " 
+                << m_located_queens << " Queens were located." << endl;
+            
+            m_located_queens = 0;
+            for (auto& row : m_chess_board) {
+                row.fill('\0');
+            }
+            m_queens_position.clear();
+        }
 
-    // Paint chess board
-    paint_chess_board();
+        if (first_queen_i < POS_NUMBER-1) {
+            first_queen_i++;
+        } else {
+            first_queen_i = 0;
+            first_queen_j++;
+            if (first_queen_j>=POS_NUMBER) {
+                all_combinations_tried=true;
+                cout << "====================================" << endl;
+                cout << "All possible cobinations were tried." << endl;
+                cout << successful_combinations << " successful combinations found!!!" << endl;
+                cout << "====================================" << endl;
+            }
+        }
+    }
+    cout << "End : Eight Queens" << endl;
+
 }
 
 bool EightQueens::is_queen_in_row(int& row) {
@@ -56,7 +91,101 @@ bool EightQueens::is_queen_in_col(int& col) {
     return false;
 }
 
-bool EightQueens::is_queen_in_diagonal(int& i, int& j) {
+bool EightQueens::is_queen_in_diagonal(const int& i, const int& j) {
+
+    pair<int, int> diag_increment{0,0};
+
+    bool limit_reached{false};
+    diag_increment.first=i;
+    diag_increment.second=j;
+
+    // diagonal down-rigth
+    while (!limit_reached) {
+        diag_increment.first++;
+        diag_increment.second++;
+        if ((diag_increment.first < POS_NUMBER) && 
+            (diag_increment.second < POS_NUMBER)) {
+            // check if the new incremented diagonal position is found in m_queens_position
+            for (const auto& [key, queen_position] : m_queens_position) {
+                if ((queen_position.first == diag_increment.first) &&
+                    (queen_position.second == diag_increment.second)) {
+                    // cout << "queen found diagonally down-right" << endl;
+                    return true;
+                }
+            }
+        } else {
+            // cout << "limit reached down-right!" << endl;
+            limit_reached=true;
+        }
+    }
+
+    // diagonal up-left
+    limit_reached=false;
+    diag_increment.first=i;
+    diag_increment.second=j;
+
+    while (!limit_reached) {
+        diag_increment.first--;
+        diag_increment.second--;
+        if ((diag_increment.first >= 0) && 
+            (diag_increment.second >= 0)) {
+            // check if the new incremented diagonal position is found in m_queens_position
+            for (const auto& [key, queen_position] : m_queens_position) {
+                if ((queen_position.first == diag_increment.first) &&
+                    (queen_position.second == diag_increment.second)) {
+                    return true;
+                }
+            }
+        } else {
+            limit_reached=true;
+        }
+    }
+
+
+   // diagonal up-right
+    limit_reached=false;
+    diag_increment.first=i;
+    diag_increment.second=j;
+
+    while (!limit_reached) {
+        diag_increment.first++;
+        diag_increment.second--;
+        if ((diag_increment.first < POS_NUMBER) && 
+            (diag_increment.second >= 0)) {
+            // check if the new incremented diagonal position is found in m_queens_position
+            for (const auto& [key, queen_position] : m_queens_position) {
+                if ((queen_position.first == diag_increment.first) &&
+                    (queen_position.second == diag_increment.second)) {
+                    return true;
+                }
+            }
+        } else {
+            limit_reached=true;
+        }
+    }
+
+   // diagonal down-left
+    limit_reached=false;
+    diag_increment.first=i;
+    diag_increment.second=j;
+
+    while (!limit_reached) {
+        diag_increment.first--;
+        diag_increment.second++;
+        if ((diag_increment.first >= 0) && 
+            (diag_increment.second < POS_NUMBER)) {
+            // check if the new incremented diagonal position is found in m_queens_position
+            for (const auto& [key, queen_position] : m_queens_position) {
+                if ((queen_position.first == diag_increment.first) &&
+                    (queen_position.second == diag_increment.second)) {
+                    return true;
+                }
+            }
+        } else {
+            limit_reached=true;
+        }
+    }
+
     return false;
 }
 
@@ -82,8 +211,6 @@ void EightQueens::paint_chess_board() {
         }
     }
     cout << BOARD_LIMIT << endl;
-
-    cout << "End : Eight Queens" << endl;
 }
 
 
