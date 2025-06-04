@@ -1,0 +1,1 @@
+/usr/bin/g++ -g CMakeFiles/myprogram.dir/main.cpp.o CMakeFiles/myprogram.dir/src/WeatherStatistics/weather_statistics.cpp.o -o myprogram 

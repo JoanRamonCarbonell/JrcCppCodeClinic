@@ -1,0 +1,3 @@
+/home/jr/Documents/repos/c++/code_clinic/build/CMakeFiles/myprogram.dir
+/home/jr/Documents/repos/c++/code_clinic/build/CMakeFiles/edit_cache.dir
+/home/jr/Documents/repos/c++/code_clinic/build/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/home/jr/Documents/repos/c++/code_clinic/build",
+  "command": "/usr/bin/g++  -I/home/jr/Documents/repos/c++/code_clinic/include -g -std=gnu++17 -o CMakeFiles/myprogram.dir/main.cpp.o -c /home/jr/Documents/repos/c++/code_clinic/main.cpp",
+  "file": "/home/jr/Documents/repos/c++/code_clinic/main.cpp",
+  "output": "CMakeFiles/myprogram.dir/main.cpp.o"
+},
+{
+  "directory": "/home/jr/Documents/repos/c++/code_clinic/build",
+  "command": "/usr/bin/g++  -I/home/jr/Documents/repos/c++/code_clinic/include -g -std=gnu++17 -o CMakeFiles/myprogram.dir/src/WeatherStatistics/weather_statistics.cpp.o -c /home/jr/Documents/repos/c++/code_clinic/src/WeatherStatistics/weather_statistics.cpp",
+  "file": "/home/jr/Documents/repos/c++/code_clinic/src/WeatherStatistics/weather_statistics.cpp",
+  "output": "CMakeFiles/myprogram.dir/src/WeatherStatistics/weather_statistics.cpp.o"
+}
+]
