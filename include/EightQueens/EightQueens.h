@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <utility>
+
 namespace eight_queens
 {
 constexpr auto MAX_POSITION{8};
