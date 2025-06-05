@@ -18,8 +18,8 @@ void EightQueens::run() {
         m_located_queens++;
     }};
     
-    auto first_queen_i=0;
-    auto first_queen_j=0;
+    auto first_queen_i{0};
+    auto first_queen_j{0};
     while (!all_combinations_tried) {
         cout << "___________________________________________" << endl;
         cout << "+++ Starting with first queen at (" << first_queen_i << "," << first_queen_j << ") +++" << endl;
@@ -80,6 +80,7 @@ void EightQueens::run() {
 }
 
 bool EightQueens::is_queen_in_row(int& row) {
+
     for (const auto& [key, pair] : m_queens_position) {
         if (row == pair.first) { 
             return true;
@@ -89,6 +90,7 @@ bool EightQueens::is_queen_in_row(int& row) {
 }
 
 bool EightQueens::is_queen_in_col(int& col) {
+
     for (const auto& [key, pair] : m_queens_position) {
         if (col == pair.second) { 
             return true;
@@ -99,12 +101,19 @@ bool EightQueens::is_queen_in_col(int& col) {
 
 bool EightQueens::is_queen_in_diagonal(const int& i, const int& j) {
 
-    // TODO: function refactoring
-    pair<int, int> diag_increment{0,0};
-
+    pair<int, int> diag_increment{i,j};
     bool limit_reached{false};
-    diag_increment.first=i;
-    diag_increment.second=j;
+
+    auto is_queen_found{[this](pair<int, int> diag_increment){
+        for (const auto& [key, queen_position] : m_queens_position) {
+            if ((queen_position.first == diag_increment.first) &&
+                (queen_position.second == diag_increment.second)) {
+                // queen found diagonally
+                return true;
+            }
+        }
+        return false;
+    }};
 
     // diagonal down-rigth
     while (!limit_reached) {
@@ -112,83 +121,57 @@ bool EightQueens::is_queen_in_diagonal(const int& i, const int& j) {
         diag_increment.second++;
         if ((diag_increment.first < MAX_POSITION) && 
             (diag_increment.second < MAX_POSITION)) {
-            // check if the new incremented diagonal position is found in m_queens_position
-            for (const auto& [key, queen_position] : m_queens_position) {
-                if ((queen_position.first == diag_increment.first) &&
-                    (queen_position.second == diag_increment.second)) {
-                    // cout << "queen found diagonally down-right" << endl;
-                    return true;
-                }
-            }
+            if (is_queen_found(diag_increment)) { return true; }
         } else {
-            // cout << "limit reached down-right!" << endl;
+            // limit reached down-right
             limit_reached=true;
         }
     }
 
     // diagonal up-left
     limit_reached=false;
-    diag_increment.first=i;
-    diag_increment.second=j;
+    diag_increment={i,j};
 
     while (!limit_reached) {
         diag_increment.first--;
         diag_increment.second--;
         if ((diag_increment.first >= 0) && 
             (diag_increment.second >= 0)) {
-            // check if the new incremented diagonal position is found in m_queens_position
-            for (const auto& [key, queen_position] : m_queens_position) {
-                if ((queen_position.first == diag_increment.first) &&
-                    (queen_position.second == diag_increment.second)) {
-                    return true;
-                }
-            }
+            if (is_queen_found(diag_increment)) { return true; }
         } else {
+            // limit reached up-left
             limit_reached=true;
         }
     }
 
-
-   // diagonal up-right
+    // diagonal up-right
     limit_reached=false;
-    diag_increment.first=i;
-    diag_increment.second=j;
+    diag_increment={i,j};
 
     while (!limit_reached) {
         diag_increment.first++;
         diag_increment.second--;
         if ((diag_increment.first < MAX_POSITION) && 
             (diag_increment.second >= 0)) {
-            // check if the new incremented diagonal position is found in m_queens_position
-            for (const auto& [key, queen_position] : m_queens_position) {
-                if ((queen_position.first == diag_increment.first) &&
-                    (queen_position.second == diag_increment.second)) {
-                    return true;
-                }
-            }
+            if (is_queen_found(diag_increment)) { return true; }
         } else {
+            // limit reached up-right
             limit_reached=true;
         }
     }
 
-   // diagonal down-left
+    // diagonal down-left
     limit_reached=false;
-    diag_increment.first=i;
-    diag_increment.second=j;
+    diag_increment={i,j};
 
     while (!limit_reached) {
         diag_increment.first--;
         diag_increment.second++;
         if ((diag_increment.first >= 0) && 
             (diag_increment.second < MAX_POSITION)) {
-            // check if the new incremented diagonal position is found in m_queens_position
-            for (const auto& [key, queen_position] : m_queens_position) {
-                if ((queen_position.first == diag_increment.first) &&
-                    (queen_position.second == diag_increment.second)) {
-                    return true;
-                }
-            }
+            if (is_queen_found(diag_increment)) { return true; }
         } else {
+            // limit reached down-left
             limit_reached=true;
         }
     }
@@ -200,7 +183,7 @@ void EightQueens::paint_chess_board() {
 
     std::string line;
 
-    cout << "*** Chess board: ***" << endl;
+    cout << CHESS_BOARD_TITLE << endl;
     cout << BOARD_LIMIT << endl;
     int interline_counter{0};
 
@@ -223,6 +206,5 @@ void EightQueens::paint_chess_board() {
     }
     cout << BOARD_LIMIT << endl;
 }
-
 
 } // eight_queens

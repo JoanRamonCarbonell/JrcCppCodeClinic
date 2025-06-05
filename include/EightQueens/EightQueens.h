@@ -12,6 +12,7 @@ constexpr auto QUEENS_NUM{8};
 constexpr auto QUEEN{'Q'};
 constexpr auto COLUMN_LIMIT{" | "};
 
+const std::string CHESS_BOARD_TITLE{"*** Chess board: ***"};
 const std::string BOARD_LIMIT{" +===============================+"};
 const std::string BOARD_INTERLINE{" |-------------------------------|"};
 const std::string SUCCESS_MSG{"The 8 QUEENS were successfully located!!!"}; 
