@@ -23,7 +23,7 @@ void EightQueens::run() {
     while (!all_combinations_tried) {
         cout << "___________________________________________" << endl;
         cout << "+++ Starting with first queen at (" << first_queen_i << "," << first_queen_j << ") +++" << endl;
-        // Locate 1st queen 
+        // Locate 1st queen in current combination
         locate_queen(first_queen_i, first_queen_j);
         // find where to locate next queen
         for (auto i=0; i<MAX_POSITION ; i++) {
@@ -40,13 +40,19 @@ void EightQueens::run() {
         }
         
         if (m_located_queens == QUEENS_NUM) {
+            // when 8 queens are located, we have a successful solution
             paint_chess_board();
             cout << SUCCESS_MSG << endl;
             successful_combinations++;
         } else {
-            cout << "Starting from (" << first_queen_i << "," << first_queen_j << ")" << " only " 
-                << m_located_queens << " Queens were located." << endl;
+            // the combination is not valid
+            cout << "Starting from (" 
+                 << first_queen_i << "," 
+                 << first_queen_j << ")" 
+                 << " only " << m_located_queens 
+                 << " Queens were located." << endl;
             
+            // reset and try again
             m_located_queens = 0;
             for (auto& row : m_chess_board) {
                 row.fill('\0');
@@ -54,6 +60,7 @@ void EightQueens::run() {
             m_queens_position.clear();
         }
 
+        // each combination, starts from each position in the chess board
         if (first_queen_i < MAX_POSITION-1) {
             first_queen_i++;
         } else {
@@ -197,14 +204,18 @@ void EightQueens::paint_chess_board() {
     cout << BOARD_LIMIT << endl;
     int interline_counter{0};
 
+    // paint a chess board
     for (const auto& row : m_chess_board) {
         line = "";
         line += COLUMN_LIMIT;
         for (const auto& col : row) {
+            // if a queen is found, paint it 
+            // paint a space otherwise
             line += (col == '\0' ? ' ' : col );
             line += COLUMN_LIMIT;
         }
         cout << line << endl;
+
         interline_counter++;
         if (interline_counter < MAX_POSITION) { 
             cout << BOARD_INTERLINE << endl;
