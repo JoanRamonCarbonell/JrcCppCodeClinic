@@ -1,0 +1,7 @@
+services:
+  first_srvc:
+    image: image2:second
+    ports:
+      - "8080:80"
+    env_file:
+      - common.env

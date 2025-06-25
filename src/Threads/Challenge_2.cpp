@@ -41,27 +41,22 @@ void parallel_merge_sort(int * array, unsigned int left, unsigned int right, int
 	 ***********************/
     // find middle point
     // cout << "Depth : " << depth << endl;
-    unsigned int mid = (left + right) / 2;
-
+    
     if (left < right) {
         if (depth > cores_num) {
             // base case
             // cout << "Merge executed!" << endl;
             sequential_merge_sort(array, left, right);
         } else {
+            unsigned int mid = (left + right) / 2;
             // divide & conquer
-            // cout << "Not deep enough. Parallel merge and sort again." << endl;
             depth++;
+            std::thread right_thread = std::thread(parallel_merge_sort, array, mid+1, right, depth);
             parallel_merge_sort(array, left, mid, depth);
-            std::future<void> f = std::async(std::launch::async, parallel_merge_sort, array, mid+1, right, depth);
-            // parallel_merge_sort(array, mid+1, right, depth);
-            f.get();
+            right_thread.join();
             merge(array, left, mid, right);
-            // cout << "Depth : " << depth << endl;
         }
     }
-    // cout << "merge_counter : " << merge_counter << endl;
-    // cout << "sort_counter : " << sort_counter << endl;
 }
 
 /* helper function to merge two sorted subarrays
@@ -109,7 +104,7 @@ void merge(int * array, unsigned int left, unsigned int mid, unsigned int right)
 void Challenge_2::run () {
     cout << "Challenge 2" << endl;
   	const int NUM_EVAL_RUNS = 100;
-	const int N = 100000; // number of elements to sort
+	const int N = 1000000; // number of elements to sort
     cores_num = std::thread::hardware_concurrency();
     cout << "Cores available : " << cores_num << endl;
 	

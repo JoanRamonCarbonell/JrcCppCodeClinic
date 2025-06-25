@@ -6,7 +6,6 @@
 #include <cmath>
 #include <iostream>
 #include <mutex>
-#include <vector>
 
 namespace threads
 {
@@ -27,29 +26,10 @@ void sequential_matrix_multiply(long ** A, size_t num_rows_a, size_t num_cols_a,
 	}
 }
 
-void print_matrix(std::string name, long ** A, size_t num_rows, size_t num_cols) {
-    uint64_t num_rows_{static_cast<uint64_t>(num_rows)};
-    uint64_t num_cols_{static_cast<uint64_t>(num_cols)};
-    cout << "+-------" << name << "-------+" << endl;
-    for (int i=0; i < num_rows_; i++) {
-        for (int j=0; j < num_cols_; j++) {
-            cout << " | " << A[i][j];
-        }
-        cout << " |" << endl;
-        cout << "+------------------+" << endl;
-    }
-}
-
-void rows_product_worker(long ** A, long ** B, long ** C, int row_a, size_t num_cols_a, size_t num_cols_b) {
-    // cout << "Calculate the product of the row: " << row_a << "with each of the " << num_cols_b << " columns." << endl;
-    uint64_t num_cols_a_{static_cast<uint64_t>(num_cols_a)};
-    uint64_t num_cols_b_{static_cast<uint64_t>(num_cols_b)};
-
-    for (uint64_t col_b = 0; col_b < num_cols_b_; col_b++) {
-        C[row_a][col_b] = 0;
-        for (uint64_t col_a = 0; col_a < num_cols_a_; col_a++) {
-            C[row_a][col_b] += A[row_a][col_a] * B[col_a][col_b];
-        }
+/* worker */
+void calculate_position(long ** A, long ** B, long ** C, int row_A, int col_B, size_t num_cols_a) {
+    for (int i; i < num_cols_a; i++) {
+        C[row_A][col_B] += A[row_A][i] * B[i][col_B];
     }
 }
 
@@ -60,26 +40,59 @@ void parallel_matrix_multiply(long ** A, size_t num_rows_a, size_t num_cols_a,
     /***********************
      * YOUR CODE GOES HERE *
      ***********************/
-    // Every row product will be executed in a different thread -> defined in num_rows_a
-    uint64_t num_rows_a_{static_cast<uint64_t>(num_rows_a)};
-    std::vector<std::thread> rows_product;
+    // Create a thread that calculates first element
+    auto finished1{false};
+    auto finished2{false};
+    auto row_A{0};
+    auto col_B{0};
+    std::mutex mtx;
 
-    for (int row = 0; row < num_rows_a_; row++) {
-        rows_product.emplace_back(rows_product_worker, A, B, C, row, num_cols_a, num_cols_b);
+    cout << "Start parallel_matrix_multiply" << endl;
+
+    auto next_product{[&mtx](int& row_A, int& col_B, size_t num_rows_a){
+
+        if (row_A < num_rows_a) {
+            std::lock_guard<std::mutex> my_mtx(mtx);
+            row_A++;
+            col_B++;
+            return true;
+        } else {
+            return false;
+        }
+    }};
+
+    while(!finished1 && !finished2) {
+        std::thread t1(calculate_position, A, B, C, row_A, col_B, num_cols_a);
+        std::thread t2(calculate_position, A, B, C, row_A, col_B, num_cols_a);
+        if (t1.joinable()) {
+            if (next_product(row_A, col_B, num_cols_a)) {
+                t1.join();
+                std::thread t1(calculate_position, A, B, C, row_A, col_B, num_cols_a);
+            } else {
+                t1.join();
+                finished1=true;
+            }
+        }
+        if (t2.joinable()) {
+            if (next_product(row_A, col_B, num_cols_a)) {
+                t2.join();
+                std::thread t2(calculate_position, A, B, C, row_A, col_B, num_cols_a);
+            } else {
+                t2.join();
+                finished2=true;
+            }
+        }
     }
 
-    for (auto& single_row_product : rows_product) {
-        single_row_product.join();
-    }
+    cout << "End parallel_matrix_multiply" << endl;
 }
 
 void Challenge_1::run () {
 	const int NUM_EVAL_RUNS = 3;
-    const size_t NUM = 10000;
-	const size_t NUM_ROWS_A = NUM;
-	const size_t NUM_COLS_A = NUM;
+	const size_t NUM_ROWS_A = 1000;
+	const size_t NUM_COLS_A = 1000;
 	const size_t NUM_ROWS_B = NUM_COLS_A;
-	const size_t NUM_COLS_B = NUM;
+	const size_t NUM_COLS_B = 1000;
 
     // intialize A and B with values in range 1 to 100    
     long ** A = (long **)malloc(NUM_ROWS_A * sizeof(long));
@@ -115,18 +128,7 @@ void Challenge_1::run () {
 
     cout << "Evaluating Sequential Implementation..." << endl;
 	std::chrono::duration<double> sequential_time(0);
-
-    // cout << "Matrix A:" << endl;
-    // print_matrix("Matrix A", A, NUM_ROWS_A, NUM_COLS_A);
-
-    // cout << "Matrix B:" << endl;
-    // print_matrix("Matrix B", B, NUM_ROWS_B, NUM_COLS_B);
-
     sequential_matrix_multiply(A, NUM_COLS_A, NUM_ROWS_A, B, NUM_COLS_B, NUM_ROWS_B, sequential_result); // "warm up"
-
-    // cout << "Matrix Product Sequential:" << endl;
-    // print_matrix("Seq", sequential_result, NUM_ROWS_A, NUM_COLS_B);
-
     for (int i=0; i<NUM_EVAL_RUNS; i++) {
         auto startTime = std::chrono::high_resolution_clock::now();
         sequential_matrix_multiply(A, NUM_COLS_A, NUM_ROWS_A, B, NUM_COLS_B, NUM_ROWS_B, sequential_result);
@@ -136,12 +138,7 @@ void Challenge_1::run () {
 
     cout << "Evaluating Parallel Implementation..." << endl;
 	std::chrono::duration<double> parallel_time(0);
-
     parallel_matrix_multiply(A, NUM_COLS_A, NUM_ROWS_A, B, NUM_COLS_B, NUM_ROWS_B, parallel_result); // "warm up"
-
-    // cout << "Matrix Product Parallel:" << endl;
-    // print_matrix("Par", parallel_result, NUM_ROWS_A, NUM_COLS_B);
-
     for (int i=0; i<NUM_EVAL_RUNS; i++) {
         auto startTime = std::chrono::high_resolution_clock::now();
         parallel_matrix_multiply(A, NUM_COLS_A, NUM_ROWS_A, B, NUM_COLS_B, NUM_ROWS_B, parallel_result);
@@ -152,7 +149,6 @@ void Challenge_1::run () {
     // verify sequential and parallel results
     for (size_t i=0; i<NUM_ROWS_A; i++) {
         for (size_t j=0; j<NUM_COLS_B; j++) {
-            // cout << "sequential_result: " << sequential_result[i][j] << "parallel_result: " << parallel_result[i][j] << endl; 
             if (sequential_result[i][j] != parallel_result[i][j]) {
                 cout << "ERROR: Result mismatch at row " << i << ", col " << j << "!" << endl;
             }
